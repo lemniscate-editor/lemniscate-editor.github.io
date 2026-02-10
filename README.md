@@ -1,6 +1,10 @@
 # Lemniscate Editor
 
-A simple Markdown with LaTeX editor in the browser. Leverages Web Assembly ports of Pandoc and TeXLive for PDF compilation.
+A simple Markdown with LaTeX editor in the browser.
+
+## How it Works
+
+The text in the editor is converted from Markdown to LaTeX using the Web Assembly port of Pandoc. Optional Pandoc Markdown extensions may be applied in the document configuration and both article and Beamer document classes are supported in the conversion from Markdown to LaTeX. Since the Pandoc port cannot generate PDF files directly, the output is then passed to Siglum's Web Assembly port of TeXLive and a PDF is generated using pdfTeX. A preamble for the LaTeX document may be included in the document configuration.
 
 ## About
 
