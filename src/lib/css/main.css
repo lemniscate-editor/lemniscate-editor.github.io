@@ -1,0 +1,70 @@
+body {
+    font-family: 'LMRoman-Bold' !important;
+}
+h1 {
+    font-family: 'LMRoman' !important;
+}
+.cm-content {
+    font-family: 'LMMono';
+    font-size: large;
+}
+.codemirror-wrapper {
+    height: 80vh;
+}
+.cm-editor {
+    height: 100%;
+}
+.bx--tooltip--definition {
+    padding: 3px 7px 3px 7px;
+}
+.bx--tooltip__trigger.bx--tooltip__trigger--definition {
+    border-bottom-width: 0px;
+}
+.bx--tooltip--definition:hover {
+    background-color: var(--cds-hover-ui);
+}
+
+    .bx--tooltip__trigger.bx--tooltip--bottom:focus svg,
+    .bx--tooltip__trigger.bx--tooltip__trigger--definition.bx--tooltip--bottom:focus
+ {
+    outline-width: 0px;
+}
+
+    .bx--tooltip--definition:hover,
+    .bx--tooltip__trigger.bx--tooltip--bottom:hover svg,
+    .bx--tooltip__trigger.bx--tooltip__trigger--definition.bx--tooltip--bottom:hover
+ {
+    cursor: pointer;
+}
+.bx--radio-button-wrapper {
+    padding-top: 8px;
+}
+.bx--list__item {
+    margin-left: 1rem;
+}
+.hidden {
+    display: none;
+}
+.center-row {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1em;
+}
+.toolbar-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.toolbar-wrapper > :first-child {
+    display: flex;
+    justify-content: flex-start;
+    flex-grow: 1;
+    flex-basis: 0;
+}
+.toolbar-wrapper > :last-child {
+    display: flex;
+    justify-content: flex-end;
+    flex-grow: 1;
+    flex-basis: 0;
+}

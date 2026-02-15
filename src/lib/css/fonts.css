@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'LMMono';
+    src: url('lmmono.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'LMRoman';
+    src: url('lmroman.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'LMRoman-Bold';
+    src: url('lmroman-bold.woff2') format('woff2');
+}
