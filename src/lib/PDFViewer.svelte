@@ -31,6 +31,10 @@
         SpreadMode
     } from '@embedpdf/plugin-spread/svelte'
     import { FullscreenPluginPackage } from '@embedpdf/plugin-fullscreen/svelte';
+    /*import {
+        TilingLayer,
+        TilingPluginPackage
+    } from '@embedpdf/plugin-tiling/svelte';*/
 
     import { SettingsStore } from './stores.ts';
     import PDFPluginLoader from './PDFPluginLoader.svelte';
@@ -47,7 +51,7 @@
     const pdfEngine = usePdfiumEngine();
     const plugins = [
         createPluginRegistration(DocumentManagerPluginPackage, {
-            initialDocuments: [{ url: asset('initial.pdf') }]
+            initialDocuments: [{ url: asset('using-lemniscate-editor.pdf') }]
         }),
         createPluginRegistration(ViewportPluginPackage),
         createPluginRegistration(ScrollPluginPackage),
@@ -60,7 +64,12 @@
         createPluginRegistration(SpreadPluginPackage, {
             defaultSpreadMode: SpreadMode.None
         }),
-        createPluginRegistration(FullscreenPluginPackage)
+        createPluginRegistration(FullscreenPluginPackage),
+        /*createPluginRegistration(TilingPluginPackage, {
+            tileSize: 768,
+            overlapPx: 5,
+            extraRings: 0
+        })*/
     ];
 
     let docManager: DocumentManager | undefined = $state(undefined);
@@ -126,7 +135,15 @@
                         style:height='{page.height}px'
                         style:position='relative'
                     >
-                        <RenderLayer {documentId} pageIndex={page.pageIndex} />
+                        <RenderLayer
+                            {documentId}
+                            pageIndex={page.pageIndex}
+                            scale={1.0}
+                        />
+                        <!--TilingLayer
+                            {documentId}
+                            pageIndex={page.pageIndex}
+                        /-->
                     </div>
                     {/snippet}
                     <PDFPluginLoader

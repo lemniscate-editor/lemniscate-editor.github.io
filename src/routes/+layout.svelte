@@ -7,10 +7,14 @@
         Theme
     } from 'carbon-components-svelte';
 
+    import Notification from '$lib/Notification.svelte';
     import { SettingsStore } from '../lib/stores.ts';
 
     let { children } = $props();
 </script>
 
 <Theme theme={$SettingsStore.theme === 'light' ? 'g10' : 'g90'} />
-<Content>{@render children()}</Content>
+<Content>
+    <Notification />
+    {@render children()}
+</Content>

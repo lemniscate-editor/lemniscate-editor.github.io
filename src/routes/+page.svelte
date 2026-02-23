@@ -47,6 +47,7 @@
     import SettingsModal from '$lib/SettingsModal.svelte';
     import PDFViewer from '$lib/PDFViewer.svelte';
 
+    import { openNotification } from '$lib/Notification.svelte';
     import {
         ConfigStore,
         EditorStore,
@@ -104,6 +105,10 @@
     }
 
     const compile = async (): Promise<void> => {
+        if (!runner.isInitialized()) {
+            openNotification.set(true);
+            return;
+        }
         let metablock = `---\nlinkcolor: blue\n`;
         if ($ConfigStore.title !== '') metablock += `title: ${$ConfigStore.title}\n`;
         if ($ConfigStore.author !== '') metablock += `author: ${$ConfigStore.author}\n`;
