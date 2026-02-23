@@ -10,7 +10,7 @@
     import {
         Scroller,
         ScrollPluginPackage,
-        type RenderPageProps,
+        type RenderPageProps
     } from '@embedpdf/plugin-scroll/svelte';
     import {
         DocumentManagerPluginPackage,
@@ -31,10 +31,10 @@
         SpreadMode
     } from '@embedpdf/plugin-spread/svelte'
     import { FullscreenPluginPackage } from '@embedpdf/plugin-fullscreen/svelte';
-    /*import {
+    import {
         TilingLayer,
         TilingPluginPackage
-    } from '@embedpdf/plugin-tiling/svelte';*/
+    } from '@embedpdf/plugin-tiling/svelte';
 
     import { SettingsStore } from './stores.ts';
     import PDFPluginLoader from './PDFPluginLoader.svelte';
@@ -61,15 +61,15 @@
         createPluginRegistration(ZoomPluginPackage, {
             defaultZoomLevel: ZoomMode.FitPage,
         }),
-        createPluginRegistration(SpreadPluginPackage, {
+        /*createPluginRegistration(SpreadPluginPackage, {
             defaultSpreadMode: SpreadMode.None
-        }),
+        }),*/
         createPluginRegistration(FullscreenPluginPackage),
-        /*createPluginRegistration(TilingPluginPackage, {
+        createPluginRegistration(TilingPluginPackage, {
             tileSize: 768,
             overlapPx: 5,
             extraRings: 0
-        })*/
+        })
     ];
 
     let docManager: DocumentManager | undefined = $state(undefined);
@@ -140,10 +140,10 @@
                             pageIndex={page.pageIndex}
                             scale={1.0}
                         />
-                        <!--TilingLayer
+                        <TilingLayer
                             {documentId}
                             pageIndex={page.pageIndex}
-                        /-->
+                        />
                     </div>
                     {/snippet}
                     <PDFPluginLoader

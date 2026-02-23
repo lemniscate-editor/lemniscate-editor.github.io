@@ -45,7 +45,7 @@
     fullscreen = useFullscreen();
     print = usePrint(() => documentId);
     zoom = useZoom(() => documentId);
-    spread = useSpread(() => documentId);
+    //spread = useSpread(() => documentId);
 </script>
 
 <span></span>

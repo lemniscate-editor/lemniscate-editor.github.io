@@ -213,7 +213,7 @@
                         tooltipText='View Editor Only'
                         on:click={() => {
                             panelVisibility = 'editor';
-                            pdfview.spreadPdf(false);
+                            //pdfview.spreadPdf(false);
                         }}
                     >
                         <RightPanelClose />
@@ -222,7 +222,7 @@
                         tooltipText='View Split Screen'
                         on:click={() => {
                             panelVisibility = 'split';
-                            pdfview.spreadPdf(false);
+                            //pdfview.spreadPdf(false);
                         }}
                     >
                         <SplitScreen />
@@ -231,7 +231,7 @@
                         tooltipText='View PDF Only'
                         on:click={() => {
                             panelVisibility = 'pdfviewer';
-                            pdfview.spreadPdf(true);
+                            //pdfview.spreadPdf(true);
                         }}
                     >
                         <SidePanelClose />
