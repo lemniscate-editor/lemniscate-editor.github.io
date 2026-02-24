@@ -10,6 +10,7 @@
     import {
         Scroller,
         ScrollPluginPackage,
+        ScrollStrategy,
         type RenderPageProps
     } from '@embedpdf/plugin-scroll/svelte';
     import {
@@ -54,16 +55,18 @@
             initialDocuments: [{ url: asset('using-lemniscate-editor.pdf') }]
         }),
         createPluginRegistration(ViewportPluginPackage),
-        createPluginRegistration(ScrollPluginPackage),
+        createPluginRegistration(ScrollPluginPackage, {
+            defaultStrategy: ScrollStrategy.Vertical
+        }),
         createPluginRegistration(RenderPluginPackage),
         createPluginRegistration(PrintPluginPackage),
         createPluginRegistration(ExportPluginPackage),
         createPluginRegistration(ZoomPluginPackage, {
             defaultZoomLevel: ZoomMode.FitPage,
         }),
-        /*createPluginRegistration(SpreadPluginPackage, {
+        createPluginRegistration(SpreadPluginPackage, {
             defaultSpreadMode: SpreadMode.None
-        }),*/
+        }),
         createPluginRegistration(FullscreenPluginPackage),
         createPluginRegistration(TilingPluginPackage, {
             tileSize: 768,
@@ -129,36 +132,37 @@
             <DocumentContent {documentId}>
                 {#snippet children(documentContent)}
                 {#if documentContent.isLoaded}
-                    {#snippet renderPage(page: RenderPageProps)}
                     <div
-                        style:width='{page.width}px'
-                        style:height='{page.height}px'
+                        style:width='100%'
+                        style:height='100%'
                         style:position='relative'
                     >
-                        <RenderLayer
-                            {documentId}
-                            pageIndex={page.pageIndex}
-                            scale={1.0}
-                        />
-                        <TilingLayer
-                            {documentId}
-                            pageIndex={page.pageIndex}
-                        />
+                        <Viewport {documentId} style={$SettingsStore.theme === 'dark' ? 'background-color:#2E3235' : 'background-color:#FFFFFF'}>
+                            <Scroller {documentId}>
+                                {#snippet renderPage(page: RenderPageProps)}
+                                <RenderLayer
+                                    {documentId}
+                                    pageIndex={page.pageIndex}
+                                    scale={1.0}
+                                />
+                                <TilingLayer
+                                    {documentId}
+                                    pageIndex={page.pageIndex}
+                                />
+                                {/snippet}
+                            </Scroller>
+                            <PDFPluginLoader
+                                bind:activeDocument
+                                bind:docManager
+                                bind:exportApi
+                                bind:fullscreen
+                                bind:print
+                                bind:spread
+                                bind:zoom
+                                {documentId}
+                            />
+                        </Viewport>
                     </div>
-                    {/snippet}
-                    <PDFPluginLoader
-                        bind:activeDocument
-                        bind:docManager
-                        bind:exportApi
-                        bind:fullscreen
-                        bind:print
-                        bind:spread
-                        bind:zoom
-                        {documentId}
-                    />
-                    <Viewport {documentId} style={$SettingsStore.theme === 'dark' ? 'background-color:#2E3235' : 'background-color:#FFFFFF'}>
-                    <Scroller {documentId} {renderPage} />
-                    </Viewport>
                 {/if}
                 {/snippet}
             </DocumentContent>
