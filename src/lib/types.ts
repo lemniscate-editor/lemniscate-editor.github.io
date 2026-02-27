@@ -14,6 +14,11 @@ import type {
     FullscreenCapability,
     FullscreenState
 } from '@embedpdf/plugin-fullscreen/svelte';
+import type {
+    SearchScope,
+    SearchDocumentState
+} from '@embedpdf/plugin-search/svelte';
+import type { ScrollCapability } from '@embedpdf/plugin-scroll/svelte';
 
 export interface ActiveDocument {
     activeDocumentId: string | null;
@@ -47,6 +52,17 @@ export interface UseZoomReturn {
 export interface UseSpreadReturn {
     provides: SpreadScope | null;
     spreadMode: SpreadMode;
+}
+
+export interface UseSearchReturn {
+    provides: SearchScope | null;
+    state: SearchDocumentState;
+}
+
+export interface ScrollManager {
+    provides: Readonly<ScrollCapability> | null;
+    isLoading: boolean;
+    ready: Promise<void>;
 }
 
 export type PaperSizes =

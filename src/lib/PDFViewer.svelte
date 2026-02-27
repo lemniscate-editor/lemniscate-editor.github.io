@@ -36,6 +36,10 @@
         TilingLayer,
         TilingPluginPackage
     } from '@embedpdf/plugin-tiling/svelte';
+    import {
+        SearchLayer,
+        SearchPluginPackage
+    } from '@embedpdf/plugin-search/svelte';
 
     import { SettingsStore } from './stores.ts';
     import PDFPluginLoader from './PDFPluginLoader.svelte';
@@ -43,8 +47,10 @@
         ActiveDocument,
         DocumentManager,
         Fullscreen,
+        ScrollManager,
         UseExportReturn,
         UsePrintReturn,
+        UseSearchReturn,
         UseSpreadReturn,
         UseZoomReturn
     } from './types';
@@ -72,7 +78,8 @@
             tileSize: 768,
             overlapPx: 5,
             extraRings: 0
-        })
+        }),
+        createPluginRegistration(SearchPluginPackage)
     ];
 
     let docManager: DocumentManager | undefined = $state(undefined);
@@ -82,6 +89,8 @@
     let spread: UseSpreadReturn | undefined = $state(undefined);
     let zoom: UseZoomReturn | undefined = $state(undefined);
     let fullscreen: Fullscreen | undefined = $state(undefined);
+    let search: UseSearchReturn | undefined = $state(undefined);
+    let scrollManager: ScrollManager | undefined = $state(undefined);
     
     let isPrinting = $state(false);
 
@@ -117,6 +126,41 @@
     export function fullscreenPdf(): void {
         fullscreen!.provides?.toggleFullscreen(`#${activeDocument?.activeDocumentId}`)
     }
+
+    export function searchPdf(query: string): void {
+        if (!search) return;
+        query === '' ? search.provides?.stopSearch() : search.provides?.searchAllPages(query);
+    }
+
+    export function changeSearchResult(dir: 'prev' | 'next'): void {
+        dir === 'prev' ? search!.provides?.previousResult() : search!.provides?.nextResult();
+    }
+
+    function scrollToItem(index: number): void {
+        const item = search!.state.results[index];
+        if (!item) return;
+        const minCoordinates = item.rects.reduce(
+            (min, rect) => ({
+                x: Math.min(min.x, rect.origin.x),
+                y: Math.min(min.y, rect.origin.y),
+            }),
+            { x: Infinity, y: Infinity },
+        );
+        scrollManager!.provides?.scrollToPage({
+            pageNumber: item.pageIndex + 1,
+            pageCoordinates: minCoordinates,
+            alignX: 50,
+            alignY: 50
+        });
+    }
+
+    $effect(() => {
+        if (search &&
+            typeof search.state.activeResultIndex === 'number' &&
+            !search.state.loading &&
+            search.state.results.length > 0)
+        scrollToItem(search.state.activeResultIndex);
+    });
 </script>
  
 {#if pdfEngine.isLoading || !pdfEngine.engine}
@@ -124,7 +168,7 @@
         Loading PDF Engine...
     </div>
 {:else}
-    <div style='height: 80vh;'>
+    <div class='pdf-wrapper'>
         <EmbedPDF engine={pdfEngine.engine} {plugins}>
         {#snippet children({ activeDocumentId })}
             {#if activeDocumentId}
@@ -132,12 +176,11 @@
             <DocumentContent {documentId}>
                 {#snippet children(documentContent)}
                 {#if documentContent.isLoaded}
-                    <div
-                        style:width='100%'
-                        style:height='100%'
-                        style:position='relative'
-                    >
-                        <Viewport {documentId} style={$SettingsStore.theme === 'dark' ? 'background-color:#2E3235' : 'background-color:#FFFFFF'}>
+                    <div class='viewport-wrapper'>
+                        <Viewport
+                            {documentId}
+                            style={$SettingsStore.theme === 'dark' ? 'background-color:#2E3235' : 'background-color:#FFFFFF'}
+                        >
                             <Scroller {documentId}>
                                 {#snippet renderPage(page: RenderPageProps)}
                                 <RenderLayer
@@ -149,6 +192,10 @@
                                     {documentId}
                                     pageIndex={page.pageIndex}
                                 />
+                                <SearchLayer
+                                    {documentId}
+                                    pageIndex={page.pageIndex}
+                                />
                                 {/snippet}
                             </Scroller>
                             <PDFPluginLoader
@@ -157,6 +204,8 @@
                                 bind:exportApi
                                 bind:fullscreen
                                 bind:print
+                                bind:scrollManager
+                                bind:search
                                 bind:spread
                                 bind:zoom
                                 {documentId}

@@ -3,15 +3,21 @@
         onMount,
         type SvelteComponent
     } from 'svelte';
+    import { slide } from 'svelte/transition';
     import {
         Column,
         FileUploaderButton,
         Grid,
         Row,
+        Stack,
+        TextInput,
         Toolbar,
         TooltipDefinition
     } from 'carbon-components-svelte';
     import {
+        ChevronLeft,
+        ChevronRight,
+        Close,
         DocumentAdd,
         DocumentConfiguration,
         DocumentExport,
@@ -23,6 +29,7 @@
         Play,
         Printer,
         RightPanelClose,
+        Search,
         Settings,
         SidePanelClose,
         SplitScreen,
@@ -60,6 +67,7 @@
     let openSettingsModal: boolean = $state(false);
     let openImageManager: boolean = $state(false);
     let openAboutHelp: boolean = $state(false);
+    let showSearch: boolean = $state(false);
 
     let panelVisibility = $state<'editor' | 'split' | 'pdfviewer'>('split');
     let smL = $derived(panelVisibility === 'pdfviewer' ? 0 : 4);
@@ -78,6 +86,7 @@
     let editorInput: string = $state($EditorStore);
     let files: ReadonlyArray<File> = $state([]);
     let images: File[] = $state([]);
+    let searchQuery: string = $state('');
 
     const runner = new BusyTexRunner({
         busytexBasePath: '/busytex'
@@ -139,6 +148,8 @@
             openErrorModal = true;
         }
     }
+
+    $effect(() => pdfview.searchPdf(searchQuery));
 
     onIdle(() => {
         EditorStore.set(editorInput);
@@ -247,11 +258,44 @@
                         <Play />
                     </TooltipDefinition>
                     <TooltipDefinition
-                        tooltipText='Download PDF'
-                        on:click={() => pdfview.exportPdf()}
+                        tooltipText='Search PDF'
+                        on:click={() => showSearch = true}
                     >
-                        <Download />
+                        <Search />
                     </TooltipDefinition>
+                    {#if showSearch}
+                        <div transition:slide={{axis:'x'}}>
+                            <Stack orientation='horizontal'>
+                                <TextInput
+                                    bind:value={searchQuery}
+                                    class='search-input'
+                                    size='sm'
+                                    hideLabel
+                                />
+                                <TooltipDefinition
+                                    tooltipText='Close Search'
+                                    on:click={() => {
+                                        showSearch = false;
+                                        searchQuery = '';
+                                    }}
+                                >
+                                    <Close />
+                                </TooltipDefinition>
+                                <TooltipDefinition
+                                    tooltipText='Previous Result'
+                                    on:click={() => pdfview.changeSearchResult('prev')}
+                                >
+                                    <ChevronLeft />
+                                </TooltipDefinition>
+                                <TooltipDefinition
+                                    tooltipText='Next Result'
+                                    on:click={() => pdfview.changeSearchResult('next')}
+                                >
+                                    <ChevronRight />
+                                </TooltipDefinition>
+                            </Stack>
+                        </div>
+                    {/if}
                     <TooltipDefinition
                         tooltipText='Zoom Out'
                         on:click={() => pdfview.zoomPdf('out')}
@@ -281,6 +325,12 @@
                         on:click={() => pdfview.printPdf()}
                     >
                         <Printer />
+                    </TooltipDefinition>
+                    <TooltipDefinition
+                        tooltipText='Download PDF'
+                        on:click={() => pdfview.exportPdf()}
+                    >
+                        <Download />
                     </TooltipDefinition>
                 </div>
             </div>
