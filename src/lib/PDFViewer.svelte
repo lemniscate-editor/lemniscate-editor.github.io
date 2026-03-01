@@ -68,7 +68,7 @@
         createPluginRegistration(PrintPluginPackage),
         createPluginRegistration(ExportPluginPackage),
         createPluginRegistration(ZoomPluginPackage, {
-            defaultZoomLevel: ZoomMode.FitPage,
+            defaultZoomLevel: ZoomMode.FitWidth,
         }),
         createPluginRegistration(SpreadPluginPackage, {
             defaultSpreadMode: SpreadMode.None
@@ -112,10 +112,11 @@
         )
     }
 
-    export function zoomPdf(op: 'in' | 'out' | 'fit'): void {
+    export function zoomPdf(op: 'in' | 'out' | 'height' | 'width'): void {
         if (op === 'in') zoom!.provides?.zoomIn();
         if (op === 'out') zoom!.provides?.zoomOut();
-        if (op === 'fit') zoom!.provides?.requestZoom(ZoomMode.FitPage)
+        if (op === 'height') zoom!.provides?.requestZoom(ZoomMode.FitPage);
+        if (op === 'width') zoom!.provides?.requestZoom(ZoomMode.FitWidth);
     }
 
     export function spreadPdf(two: boolean): void {

@@ -23,7 +23,9 @@
         DocumentExport,
         DocumentImport,
         Download,
+        FitToHeight,
         FitToScreen,
+        FitToWidth,
         Help,
         Image,
         Play,
@@ -33,7 +35,6 @@
         Settings,
         SidePanelClose,
         SplitScreen,
-        ZoomFit,
         ZoomIn,
         ZoomOut
     } from 'carbon-icons-svelte';
@@ -303,16 +304,22 @@
                         <ZoomOut />
                     </TooltipDefinition>
                     <TooltipDefinition
-                        tooltipText='Zoom to Fit'
-                        on:click={() => pdfview.zoomPdf('fit')}
-                    >
-                        <ZoomFit />
-                    </TooltipDefinition>
-                    <TooltipDefinition
                         tooltipText='Zoom In'
                         on:click={() => pdfview.zoomPdf('in')}
                     >
                         <ZoomIn />
+                    </TooltipDefinition>
+                    <TooltipDefinition
+                        tooltipText='Zoom to Page'
+                        on:click={() => pdfview.zoomPdf('height')}
+                    >
+                        <FitToHeight />
+                    </TooltipDefinition>
+                    <TooltipDefinition
+                        tooltipText='Zoom to Width'
+                        on:click={() => pdfview.zoomPdf('width')}
+                    >
+                        <FitToWidth />
                     </TooltipDefinition>
                     <TooltipDefinition
                         tooltipText='Presentation Mode'
