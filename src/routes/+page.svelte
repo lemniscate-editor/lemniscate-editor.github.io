@@ -44,7 +44,7 @@
     import { basicLight } from 'cm6-theme-basic-light';
     import FileSaver from 'file-saver';
     import { convert } from 'pandoc-wasm';
-    import { BusyTexRunner, PdfLatex } from 'texlyre-busytex';
+    import { BusyTexRunner, PdfLatex, type FileInput } from 'texlyre-busytex';
     import { listen, onIdle } from 'svelte-idle';
 
     import AboutHelpModal from '$lib/AboutHelpModal.svelte';
@@ -113,11 +113,21 @@
         const blob = new Blob([editorInput], { type: 'text/plain;charset=utf-8' });
         FileSaver.saveAs(blob, `${$ConfigStore.title === '' ? 'lemniscate-editor' : $ConfigStore.title.toLowerCase().replaceAll(/[^a-z\d\s]/g, '').replaceAll(/\s/g, '-')}.md`);
     }
-
+    
     const compile = async (): Promise<void> => {
         if (!runner.isInitialized()) {
             openNotification.set(true);
             return;
+        }
+        const reader = (file: File) => new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr);
+            fr.onerror = (err) => reject(err);
+            fr.readAsArrayBuffer(file);
+        });
+        let preamble = $ConfigStore.preamble;
+        if (images.length > 0 && !preamble.includes(`\\usepackage{graphicx}`)) {
+            preamble += `\n\\usepackage{graphicx}`;
         }
         let metablock = `---\nlinkcolor: blue\n`;
         if ($ConfigStore.title !== '') metablock += `title: ${$ConfigStore.title}\n`;
@@ -128,14 +138,24 @@
         } else {
             metablock += `geometry:\n- paper=${$ConfigStore.paperSize}\n- top=${$ConfigStore.tmargin}\n- bottom=${$ConfigStore.bmargin}\n- left=${$ConfigStore.lmargin}\n- right=${$ConfigStore.rmargin}\n`
         }
-        metablock += `header-includes:\n- |\n  \`\`\`{=latex}\n  ${$ConfigStore.preamble.replace(/\n/gm, `\n  `)}\n  \`\`\`\n...`;
+        metablock += `header-includes:\n- |\n  \`\`\`{=latex}\n  ${preamble.replace(/\n/gm, `\n  `)}\n  \`\`\`\n...`;
         const pandocResult = await convert({
             from: `markdown${$ConfigStore.extensions !== '' ? `+${$ConfigStore.extensions}` : ''}`,
             to: $ConfigStore.formatSelect === 'article' ? 'latex' : 'beamer',
             standalone: true
         }, `${metablock}\n${editorInput}`, {});
         if (pandocResult.stderr === '') {
-            const result = await engine.compile({ input: pandocResult.stdout });
+            let additionalFiles: FileInput[] = [];
+            const promises = images.map(reader);
+            const filereaders = await Promise.all(promises);
+            filereaders.forEach((fr, i) => additionalFiles.push({
+                path: images[i].name,
+                content: new Uint8Array((fr as FileReader).result as ArrayBuffer)
+            }));
+            const result = await engine.compile({ 
+                input: pandocResult.stdout,
+                additionalFiles: additionalFiles
+            });
             if (result.success) {
                 pdfview.openPdf(URL.createObjectURL(new Blob([ result.pdf! as Uint8Array<ArrayBuffer> ], { type: 'application/pdf' })));
             } else {
@@ -202,8 +222,8 @@
                         <DocumentConfiguration />
                     </TooltipDefinition>
                     <TooltipDefinition
-                        tooltipText='Image Manager (Coming Soon)'
-                        on:click={() => {}}
+                        tooltipText='Image Manager'
+                        on:click={() => openImageManager = true}
                     >
                         <Image />
                     </TooltipDefinition>

@@ -1,7 +1,8 @@
 <script lang='ts'>
     import {
         FileUploader,
-        Modal
+        Modal,
+        Stack
     } from 'carbon-components-svelte';
 
     let {
@@ -19,13 +20,17 @@
     size='sm'
     modalHeading='Image Manager'    
 >
-    <FileUploader
-        multiple
-        bind:files={images}
-        status='edit'
-        labelTitle='Upload Images'
-        buttonLabel='Add'
-        labelDescription='Allowed files: .jpg, .png'
-        accept={['.jpg', '.png']}
-    />
+    <Stack gap={5}>
+        <div>Note: image uploads are not saved when the tab/window is closed.</div>
+        <div>Use Markdown or LaTeX to insert images.</div>
+        <FileUploader
+            multiple
+            bind:files={images}
+            status='edit'
+            labelTitle='Upload Images'
+            buttonLabel='Add'
+            labelDescription='Allowed files: .jpg, .png'
+            accept={['.jpg', '.png']}
+        />
+    </Stack>
 </Modal>
